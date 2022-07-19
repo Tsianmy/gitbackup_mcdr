@@ -1,0 +1,96 @@
+git_backup:
+  help_message: |
+    ------------ {1} v{2} ------------
+    §7{0}§r 显示帮助信息
+    §7{0} status§r 显示备份状态
+    §7{0} make §e[<comment>]§r 创建新备份
+    §7{0} back §6[:<index>|<hash id>]§r 恢复到指定§6id§r
+    §7{0} confirm§r 确认回档
+    §7{0} abort§r 取消回档
+    §7{0} list §6[<limit>]§r 列出所有§6/<limit>§r条备份
+    §7{0} push§r 将备份信息推送到远程服务器
+    §7{0} prune§r 清理git仓库中的多余槽位 / commit
+    §7{0} pull§r 拉取远程服务器的备份信息
+    ============ {1} v{2} ============
+  second: "{0}秒"
+  minute: "{0}分钟"
+  hour: "{0}小时"
+  day: "{0}天"
+  slot_info: "Bid: {0}; [{1}] 注释: {2}"
+  empty_comment: 空
+  unknown_slot: 槽位输入错误，应输入一个位于[{0}, {1}]的数字
+  empty_slot: 槽位输入错误，槽位§6{0}§r为空
+
+  lock.warning: 正在{0}中，请等待操作执行完成
+  operations:
+    create: §a备份§r
+    restore: §c回档§r
+    push: §c推送远程仓库§r
+    prune: §a删除多余的槽位（commits）§r
+
+  create_backup:
+    start: §a备份§r中...请稍等
+    commit: §a提交commit§r中...请稍等
+    abort.plugin_unload: 插件重载，§a备份§r中断！
+    abort.no_slot: 未找到可用槽位，§a备份§r中断！
+    success: §a备份§r完成，耗时§6{0}§r秒
+    fail: §a备份§r失败，错误代码{0}
+  
+  push_backup:
+    push: §a推送远程仓库§r中...请稍等
+    success: §a推送远程仓库§r完成，信息§6{0}§r
+    fail: §a推送远程仓库§r失败，错误代码§6{0}§r
+
+  restore_backup:
+    echo_action: 准备将存档恢复至槽位§6{0}§r，{1}，{2}
+    confirm_hint: 使用§7{0} confirm§r 确认§c回档§r
+    confirm_hover: 点击确认
+    abort_hint: §7{0} abort§r 取消
+    abort_hover: 点击取消
+    get_info:
+      fail: §a获取存档§r失败，错误代码§6{0}§r
+
+  confirm_restore.nothing_to_confirm: 没有什么需要确认的
+
+  do_restore:
+    countdown.intro: 10秒后关闭服务器§c回档§r
+    countdown.text: 还有{0}秒，将§c回档§r为槽位§6{1}§r，{2}，{3}
+    countdown.hover: 点击终止回档！
+    abort: §c回档§r被中断！
+
+  trigger_abort.abort: 终止操作！
+
+  list_backup:
+    title: §d【槽位信息】§r
+    slot:
+      header: "[§6{0}§r]"
+      protection: "存档保护时长: {0}"
+      restore: 点击回档至槽位§6{0}§r
+      delete: 点击删除槽位§6{0}§r
+    total_space: "备份总占用空间: §a{0}§r"
+
+  prune_backup:
+    start:  §a清理多余槽位§r中...请稍等
+    success: "§a清理多余槽位§r成功, 备份占用空间: §a{0}§r"
+    fail: §a清理多余槽位§r失败
+
+  print_help:
+    hotbar: §d【快捷操作】§r
+    click_to_create:
+      text: ">>> §a点我创建一个备份§r <<<"
+      hover: 记得修改注释
+      command: "{0} make 我是一个注释"
+    click_to_restore:
+      text: ">>> §c点我回档至最近的备份§r <<<"
+      hover: 也就是回档至第一个槽位
+      command: "{0} back"
+
+  unknown_command:
+    text: 参数错误！请输入§7{0}§r以获取插件信息
+    hover: 点击查看帮助
+  command:
+    permission_denied: 权限不足
+    wrong_slot: 槽位输入错误
+  register:
+    summary_help: §a备份§r/§c回档§r
+    show_help: 点击查看帮助信息

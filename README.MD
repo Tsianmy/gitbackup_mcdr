@@ -1,9 +1,7 @@
-
 # 中文
 
 ## 依赖
-- **mcdreforged** >= ***1.0.0***
-- **nbt** *<https://github.com/zyxgad/nbt>*
+- **mcdreforged** >= ***2.0.1***
 
 ## 功能
 - 支持本地保存备份
@@ -20,39 +18,42 @@
 ## 配置
 ### 提前准备
 1. ssh-client
-2. git
+2. git >= 2.23
 3. 一个git服务器*(如github)*
 4. 服务器的git账号
 
 ### 安装
 1. 将本插件放入**MCDR**目录下的`plugins`文件夹下
 2. 运行一遍插件, 以获取`config/GitBackUp.json`配置文件
-3. 根据下文调整配置文件
-4. 使用`!!MCDR plugin reloadall`重新加载本插件
+3. 使用`!!MCDR plugin unload git_backup`卸载本插件
+4. 根据下文调整配置文件
+5. 使用`!!MCDR plugin load GitBackup-v*.mcdr`加载本插件
 
 ### 配置文件 (config/GitBackUp.json)
 ```javascript
 {
     "debug": false, // 是否开启调试信息
+    "enabled": true,
+    "turn_off_auto_save": true, // 是否在备份时关闭自动保存
     "git_path": "git", // git安装路径
-    "git_config": {
+    "git_cfg": {
         "use_remote": false, // 是否使用远程功能, 默认为false禁用
-        "remote": "https://github.com/user/repo.git", // 远程地址
-        "remote_name": "backup", // 远程分支名称
-        "branch_name": "backup", // 本地分支名称
-        "is_setup": false, // 
+        "remote": "git@github.com:user/repo.git", // 远程地址
+        "remote_name": "origin", // 远程仓库名称
+        "branch_name": "main", // 本地分支名称
+        "is_setup": false, // 插件自动判断和修改
         "user_email": "you@example.com", // git用户名邮箱
-        "user_name": "Your Name" // git用户名
+        "user_name": "Your Name", // git用户名
+        "ssh_command": ""
     },
     "backup_interval": 86400, // 每次自动备份的时间间隔(sec), 设为0以禁用
     "last_backup_time": 0, // 上次进行备份的时间
     "push_interval": 86400, // 每次惰性推送的时间间隔(sec)(会在备份完成后检查是否推送), 设为0以禁用
     "last_push_time": 0, // 上次进行推送的时间
-    "back_wait_time": 30, // 回档前的等待时间(秒)
+    "back_wait_time": 15, // 回档前的等待时间(秒)
     "backup_path": "./git_backup", // backup文件夹, git工作目录
     "cache_path": "./git_backup_cache", // 缓存文件夹, 会把回档之前的server文件夹
     "server_path": "./server", // 服务器文件夹
-    "helper_count": 1, // helper进程数量, 至少为1
     "need_backup": [ // 需要备份的文件名
         "world"
     ],
@@ -80,14 +81,13 @@
 
 - `!!gbk help` 显示帮助信息
 - `!!gbk status` 显示备份状态
-- `!!gbk list [<limit>]` 列出`所有/<limit>`条备份
 - `!!gbk make [<comment>]` 创建新备份
 - `!!gbk back [:<index>|<hash id>]` 恢复到指定id
 - `!!gbk confirm` 确认回档
 - `!!gbk abort` 取消回档
-- `!!gbk reload` 重新加载配置文件
-- `!!gbk save` 保存配置文件
+- `!!gbk list [<limit>]` 列出`所有/<limit>`条备份
 - `!!gbk push` 将备份信息推送到远程服务器
+- `!!gbk prune` 清理多余的commit
 - `!!gbk pull` 拉取远程服务器的备份信息
 
 # English

@@ -1,0 +1,43 @@
+{
+    "debug": false,
+    "enabled": true,
+    "turn_off_auto_save": true,
+    "git_path": "git",
+    "git_cfg": {
+        "use_remote": false,
+        "remote": "git@github.com:user/repo.git",
+        "remote_name": "origin",
+        "branch_name": "main",
+        "is_setup": false,
+        "user_email": "you@example.com",
+        "user_name": "Your Name",
+        "ssh_command": ""
+    },
+    "backup_interval": 86400,
+    "last_backup_time": 0,
+    "push_interval": 86400,
+    "last_push_time": 0,
+    "back_wait_time": 15,
+    "backup_path": "./git_backup",
+    "cache_path": "./git_backup_cache",
+    "server_path": "./server",
+    "need_backup": [
+        "world"
+    ],
+    "ignores": [
+        "session.lock"
+    ],
+    "minimum_permission_level": {
+        "help": 0,
+        "status": 1,
+        "list": 1,
+        "make": 1,
+        "back": 2,
+        "confirm": 1,
+        "abort": 1,
+        "reload": 2,
+        "save": 2,
+        "push": 2,
+        "pull": 2
+    }
+}

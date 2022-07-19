@@ -1,0 +1,16 @@
+{
+    "id": "git_backup",
+    "version": "2.0.0",
+    "name": "GitBackUp",
+    "description": "Minecraft Git Backup Plugin",
+    "author": [
+        "zyxgad"
+    ],
+    "link": "https://github.com/Tsianmy/gitbackup_mcdr",
+    "dependencies": {
+        "mcdreforged": ">=2.0.1"
+    },
+    "resources": [
+        "lang"
+    ]
+}

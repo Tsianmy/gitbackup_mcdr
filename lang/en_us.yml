@@ -1,0 +1,94 @@
+git_backup:
+  help_message: |
+    ------  {1} v{2} ------
+    §7{0}§r Display help message
+    §7{0} status§r Display backup status
+    §7{0} make §e[<comment>]§r Make a §abackup§r
+    §7{0} back §6[:<slot index>|<hash id>]§r §cRestore§r the world to slot §6<slot>§r
+    §7{0} confirm§r Use after execute back to confirm §crestore§r execution
+    §7{0} abort§r Abort backup §crestoring§r
+    §7{0} list§r §6[<limit>]§r Display §6[<limit>]§r slot informations
+    §7{0} push§r Push backup to remote repository
+    §7{0} prune§r Prune unreachable backup commits in git repository
+    §7{0} pull§r Pull backup from remote repository
+    ============ {1} v{2} ============
+  second: "{0} seconds"
+  minute: "{0} minutes"
+  hour: "{0} hours"
+  day: "{0} days"
+  slot_info: 'Bid: {0}; [{1}] "{2}"'
+  empty_comment: "-"
+  unknown_slot: Slot format wrong, it should be a number between [{0}, {1}]
+  empty_slot: Slot §6{}§r is empty
+
+  lock.warning: Executing "{0}", please don't spam
+  operations:
+    create: §aBacking up§r
+    restore: §cRestoring§r
+    push:  §cPushing§r
+    prune: §aPruning redundant commits / slots§r
+
+  create_backup:
+    start: §aBacking up§r, please wait
+    commit: §aCommitting§r, please wait
+    abort.plugin_unload: Plugin unloaded, §aback up§r aborted!
+    abort.no_slot: Available slot not found, §aback up§r aborted!
+    success: §aBack up§r successfully, time elapsed §6{0}§rs
+    fail: §aBack up§r unsuccessfully, error code {0}
+
+  push_backup:
+    push: §aPushing§r... please wait
+    success: §aPush§r successfully, info §6{0}§r
+    fail: §aPush§r unsuccessfully, error §6{0}§r
+
+  restore_backup:
+    echo_action: Gonna restore the world to slot §6{0}§r, {1}, {2}
+    confirm_hint: Use §7{0} confirm§r to confirm §crestore§r
+    confirm_hover: Click to confirm
+    abort_hint: §7{0} abort§r to abort
+    abort_hover: Click to abort
+    get_info:
+      fail: §aGet backup info§r unsuccessfully, error §6{0}§r
+
+  confirm_restore.nothing_to_confirm: Nothing to confirm
+
+  do_restore:
+    countdown.intro: §cRestore§r after §c{0}§r second
+    countdown.text: "{0} second later the world will be §crestored§r to slot §6{1}§r, {2}, {3}"
+    countdown.hover: Click to ABORT restore!
+    abort: §cRestore§r aborted!
+
+  trigger_abort.abort: Operation terminated!
+
+  list_backup:
+    title: §d[Backup Information]§r
+    slot:
+      header: "[§6{}§r]"
+      restore: Click to restore to slot §6{0}§r
+    total_space: "Total space consumed: §a{0}§r"
+  
+  prune_backup:
+    start:  §aPruning§r, please wait
+    success: "§aPrune§r successfully, backup space: §a{0}§r"
+    fail: §aPrune§r unsuccessfully
+
+  print_help:
+    hotbar: §d[Hotbar]§r
+    click_to_create:
+      text: ">>> §aClick me to create a backup§r <<<"
+      hover: Remember to write the comment
+      command: "{0} make I'm a comment"
+    click_to_restore:
+      text: ">>> §cClick me to restore to the latest backup§r <<<"
+      hover: as known as the first slot
+      command: "{0} back"
+
+  unknown_command:
+    text: Unknown command, input §7{0}§r for more information
+    hover: Click to see help
+  command:
+    permission_denied: Permission Denied
+    wrong_slot: Wrong Slot Number
+  register:
+    summary_help: §aback up§r/§crestore§r
+    show_help: Click to see help
