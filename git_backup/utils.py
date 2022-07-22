@@ -90,7 +90,7 @@ def copy_files(src: str, dst: str, basename: str, ignores=[], logger=None):
         dst_path = os.path.join(dst, os.path.relpath(src_path, src))
 
     log_info(logger, 'copying {} -> {}'.format(src_path, dst_path))
-    rmtree(dst_path)
+    remove_files(dst, basename, logger=logger)
     if os.path.isdir(src_path):
         shutil.copytree(src_path, dst_path, ignore=shutil.ignore_patterns(*ignores))
     elif os.path.isfile(src_path):
