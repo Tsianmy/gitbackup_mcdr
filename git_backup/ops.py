@@ -40,7 +40,7 @@ def create_backup(source: MCDR.CommandSource, comment: Optional[str], config, lo
             time.sleep(0.01)
             if GL.plugin_unloaded:
                 print_message(source, tr('create_backup.abort.plugin_unload'), tell=False)
-                return
+                raise InterruptedError()
 
         # start backup
         print_message(source, tr('create_backup.start'), tell=False)
@@ -66,6 +66,8 @@ def create_backup(source: MCDR.CommandSource, comment: Optional[str], config, lo
         end_time = time.time()
         print_message(source, tr('create_backup.success', round(end_time - start_time, 1)), tell=False)
         
+    except InterruptedError as e:
+        log_except(logger, f'[{PLUGIN_ABBR}] {e}')
     except Exception as e:
         log_except(logger, f'[{PLUGIN_ABBR}] Error creating backup')
         print_message(source, tr('create_backup.fail', e), tell=False)
@@ -74,6 +76,7 @@ def create_backup(source: MCDR.CommandSource, comment: Optional[str], config, lo
     finally:
         if config.turn_off_auto_save:
             source.get_server().execute('save-on')
+        config.last_backup_time = time.time()
 
 @single_op(tr('operations.push'))
 def push_backup(source: MCDR.CommandSource, config, logger=None):

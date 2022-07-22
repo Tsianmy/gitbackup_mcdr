@@ -17,9 +17,9 @@ class Configure(Serializable):
         'ssh_command': '',
     }
     backup_interval: int = 60 * 60 * 24 # 1 day
-    last_backup_time: int = 0
+    last_backup_time: float = 0
     push_interval: int = 60 * 60 * 24 # 1 day
-    last_push_time: int = 0
+    last_push_time: float = 0
     back_wait_time: int = 15
     backup_path: str = './git_backup'
     cache_path: str = './git_backup_cache'

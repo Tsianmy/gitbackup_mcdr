@@ -1,5 +1,5 @@
 import mcdreforged.api.all as MCDR
-from threading import Lock
+from threading import Lock, Timer
 from git_backup.config import Configure
 
 server_inst: MCDR.PluginServerInterface
@@ -14,3 +14,5 @@ plugin_unloaded: bool = False
 slot_selected: str = None
 date_selected: str = None
 comment_selected: str = None
+
+backup_timer: Timer = None

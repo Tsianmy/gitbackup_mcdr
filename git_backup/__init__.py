@@ -10,6 +10,7 @@ from git_backup.config import Configure
 from git_backup.ops import (create_backup, restore_backup, push_backup, list_backup,
                             prune_backup, command_run, get_backup_info)
 from git_backup.git import setup_git
+from git_backup.backup_timer import flush_backup_timer, cancel_backup_timer
 from git_backup.utils import debug_message, tr, print_message
 
 HelpMessage: MCDR.RTextBase
@@ -28,12 +29,18 @@ def on_load(server: MCDR.PluginServerInterface, old):
     load_config(server)
 
     if GL.config.enabled:
+        init_time = not GL.config.git_cfg['is_setup']
         setup_git(GL.config, logger=server.logger)
         save_config(server)
 
         register_command(server)
         register_event_listeners(server)
         server.register_help_message(Prefix, command_run(tr('register.summary_help'), tr('register.show_help'), Prefix))
+
+        if init_time:
+            GL.config.last_backup_time = GL.config.last_push_time = time.time()
+        GL.backup_timer = flush_backup_timer(GL.backup_timer, _timed_make_backup,
+                                             server.get_plugin_command_source(), GL.config)
     else:
         server.logger.warning(
             f'{meta.name} is not active, got config.enabled: {GL.config.enabled}')
@@ -45,6 +52,7 @@ def on_load(server: MCDR.PluginServerInterface, old):
 def on_unload(server):
     GL.abort_restore = True
     GL.plugin_unloaded = True
+    cancel_backup_timer(GL.backup_timer)
     save_config(server)
 
 def on_info(server: MCDR.PluginServerInterface, info: MCDR.Info):
@@ -108,10 +116,14 @@ def cmd_help_message(source: MCDR.CommandSource):
 
 @MCDR.new_thread(f'{PLUGIN_ABBR} - create')
 def cmd_create_backup(source: MCDR.CommandSource, comment: Optional[str]):
+    cancel_backup_timer(GL.backup_timer)
+
     create_backup(source, comment, GL.config, logger=GL.server_inst.logger)
     if GL.config.push_interval > 0 and GL.config.last_push_time + GL.config.push_interval < time.time():
         print_message(source, f'There are out {GL.config.push_interval} sec not push, pushing now...', tell=False)
         push_backup(source, GL.config, logger=GL.server_inst.logger)
+
+    GL.backup_timer = flush_backup_timer(GL.backup_timer, _timed_make_backup, source, GL.config)
 
 def cmd_restore_backup(source: MCDR.CommandSource, bid: str or int):
     try:
@@ -171,6 +183,10 @@ def cmd_prune_backup(source: MCDR.CommandSource):
     prune_backup(source, GL.config, logger=GL.server_inst.logger)
 
 ######## Utils ########
+
+def _timed_make_backup():
+    source = GL.server_inst.get_plugin_command_source()
+    cmd_create_backup(source, comment=None)
 
 def print_unknown_argument_message(source: MCDR.CommandSource, error: MCDR.UnknownArgument):
     print_message(source, command_run(

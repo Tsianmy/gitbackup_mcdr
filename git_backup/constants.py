@@ -5,6 +5,7 @@ PLUGIN_ID = 'git_backup'
 Prefix = '!!gbk'
 PLUGIN_ABBR = 'GBU'
 CONFIG_FILE = os.path.join('config', 'GitBackUp.json')
+MIN_INTERVAL = 30
 
 BACKUP_DONE_EVENT 		= LiteralEvent('{}.backup_done'.format(PLUGIN_ID))
 RESTORE_DONE_EVENT 		= LiteralEvent('{}.restore_done'.format(PLUGIN_ID))
