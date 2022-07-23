@@ -44,7 +44,7 @@
         "is_setup": false, // 插件自动判断和修改
         "user_email": "you@example.com", // git用户名邮箱
         "user_name": "Your Name", // git用户名
-        "ssh_command": ""
+        "ssh_command": "ssh"
     },
     "backup_interval": 86400, // 每次自动备份的时间间隔(sec), 设为0以禁用
     "last_backup_time": 0, // 上次进行备份的时间

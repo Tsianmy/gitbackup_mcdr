@@ -11,7 +11,7 @@
         "is_setup": false,
         "user_email": "you@example.com",
         "user_name": "Your Name",
-        "ssh_command": ""
+        "ssh_command": "ssh"
     },
     "backup_interval": 86400,
     "last_backup_time": 0,

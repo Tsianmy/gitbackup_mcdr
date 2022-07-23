@@ -2,7 +2,7 @@ from typing import List, Dict, Any
 from mcdreforged.api.utils.serializer import Serializable
 
 class Configure(Serializable):
-    debug: bool = True
+    debug: bool = False
     enabled: bool = False
     turn_off_auto_save: bool = True
     git_path: str = 'git'
@@ -14,7 +14,7 @@ class Configure(Serializable):
         'is_setup': False,
         'user_email': 'GitBackup@host.local',
         'user_name': 'GitBackup',
-        'ssh_command': '',
+        'ssh_command': 'ssh',
     }
     backup_interval: int = 60 * 60 * 24 # 1 day
     last_backup_time: float = 0
