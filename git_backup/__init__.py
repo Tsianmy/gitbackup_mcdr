@@ -8,7 +8,7 @@ from git_backup.constants import (Prefix, CONFIG_FILE, PLUGIN_ABBR,
                                   TRIGGER_BACKUP_EVENT, TRIGGER_RESTORE_EVENT)
 from git_backup.config import Configure
 from git_backup.ops import (create_backup, restore_backup, push_backup, list_backup,
-                            prune_backup, command_run, get_backup_info)
+                            prune_backup, backup_status, command_run, get_backup_info)
 from git_backup.git import setup_git
 from git_backup.backup_timer import flush_backup_timer, cancel_backup_timer
 from git_backup.utils import debug_message, tr, print_message
@@ -71,6 +71,7 @@ def register_command(server: MCDR.PluginServerInterface):
         MCDR.Literal(Prefix).
         runs(cmd_help_message).
         on_error(MCDR.UnknownArgument, print_unknown_argument_message, handled=True).
+        then(get_literal_node('status').runs(lambda src: cmd_backup_status(src))).
         then(
             get_literal_node('make').
             runs(lambda src: cmd_create_backup(src, None)).
@@ -83,7 +84,11 @@ def register_command(server: MCDR.PluginServerInterface):
         ).
         then(get_literal_node('confirm').runs(cmd_confirm_restore)).
         then(get_literal_node('abort').runs(cmd_trigger_abort)).
-        then(get_literal_node('list').runs(lambda src: cmd_list_backup(src))).
+        then(
+            get_literal_node('list').
+            runs(lambda src: cmd_list_backup(src)).
+            then(MCDR.Text('limit').runs(lambda src, ctx: cmd_list_backup(src, ctx['limit'])))
+        ).
         then(get_literal_node('push').runs(lambda src: cmd_push_backup(src))).
         then(get_literal_node('prune').runs(lambda src: cmd_prune_backup(src)))
     )
@@ -129,8 +134,9 @@ def cmd_restore_backup(source: MCDR.CommandSource, bid: str or int):
     try:
         slot, date, comment = get_backup_info(
             GL.config, int(bid[1:]) if isinstance(bid, str) and bid[0] == ':' else bid)
-    except RuntimeError as e:
-        print_message(source, tr('restore_backup.get_info.fail', e), tell=False)
+    except Exception as e:
+        GL.server_inst.logger.exception(e)
+        print_message(source, tr('restore_backup.get_info.fail'), tell=False)
         GL.slot_selected = None
         GL.date_selected = None
         GL.comment_selected = None
@@ -146,7 +152,6 @@ def cmd_restore_backup(source: MCDR.CommandSource, bid: str or int):
         command_run(tr('restore_backup.confirm_hint', Prefix), tr('restore_backup.confirm_hover'), '{0} confirm'.format(Prefix))
         + ', '
         + command_run(tr('restore_backup.abort_hint', Prefix), tr('restore_backup.abort_hover'), '{0} abort'.format(Prefix))
-        , tell=False
     )
 
 @MCDR.new_thread(f'{PLUGIN_ABBR} - restore')
@@ -181,6 +186,10 @@ def cmd_push_backup(source: MCDR.CommandSource):
 @MCDR.new_thread(f'{PLUGIN_ABBR} - prune')
 def cmd_prune_backup(source: MCDR.CommandSource):
     prune_backup(source, GL.config, logger=GL.server_inst.logger)
+
+@MCDR.new_thread(f'{PLUGIN_ABBR} - status')
+def cmd_backup_status(source: MCDR.CommandSource):
+    backup_status(source, GL.config, logger=GL.server_inst.logger)
 
 ######## Utils ########
 

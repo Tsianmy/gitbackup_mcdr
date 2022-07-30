@@ -34,12 +34,12 @@ git_backup:
     abort.plugin_unload: 插件重载，§a备份§r中断！
     abort.no_slot: 未找到可用槽位，§a备份§r中断！
     success: §a备份§r完成，耗时§6{0}§r秒
-    fail: §a备份§r失败，错误代码{0}
+    fail: §a备份§r§c失败§r
   
   push_backup:
     push: §a推送远程仓库§r中...请稍等
-    success: §a推送远程仓库§r完成，信息§6{0}§r
-    fail: §a推送远程仓库§r失败，错误代码§6{0}§r
+    success: §a推送远程仓库§r完成
+    fail: §a推送远程仓库§r§c失败§r，错误代码§6{0}§r
 
   restore_backup:
     echo_action: 准备将存档恢复至槽位§6{0}§r，{1}，{2}
@@ -48,7 +48,8 @@ git_backup:
     abort_hint: §7{0} abort§r 取消
     abort_hover: 点击取消
     get_info:
-      fail: §a获取存档§r失败，错误代码§6{0}§r
+      fail: §a获取存档§r§c失败§r
+    fail: 将存档恢复至槽位§6{0}§r§c失败§r
 
   confirm_restore.nothing_to_confirm: 没有什么需要确认的
 
@@ -59,6 +60,18 @@ git_backup:
     abort: §c回档§r被中断！
 
   trigger_abort.abort: 终止操作！
+
+  status: |
+    ------------ git backups ------------
+    当前时间: {0}
+    最近一次备份:
+      {1}
+    下次备份将在 {2} 秒后进行 
+    下次推送将在 {3} 秒后进行
+    备份文件夹总大小: {4}
+      实际大小: {5}
+      缓存大小: {6}
+    ------------ git backups ------------
 
   list_backup:
     title: §d【槽位信息】§r
@@ -72,7 +85,7 @@ git_backup:
   prune_backup:
     start:  §a清理多余槽位§r中...请稍等
     success: "§a清理多余槽位§r成功, 备份占用空间: §a{0}§r"
-    fail: §a清理多余槽位§r失败
+    fail: §a清理多余槽位§r§c失败§r
 
   print_help:
     hotbar: §d【快捷操作】§r

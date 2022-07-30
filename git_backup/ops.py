@@ -8,8 +8,8 @@ from git_backup import common as GL
 from git_backup.constants import (Prefix, PLUGIN_ABBR,
                                   BACKUP_DONE_EVENT, RESTORE_DONE_EVENT)
 from git_backup.git import run_git_cmd
-from git_backup.utils import (debug_message, log_warning, tr, log_info, log_except, print_message,
-                              mkdir, copy_files, rmtree, remove_files, get_format_time,
+from git_backup.utils import (debug_message, tr, log_info, log_except, print_message,
+                              mkdir, copy_files, rmtree, get_format_time,
                               get_dir_size, format_dir_size)
 
 def single_op(name: MCDR.RTextBase):
@@ -40,7 +40,7 @@ def create_backup(source: MCDR.CommandSource, comment: Optional[str], config, lo
             time.sleep(0.01)
             if GL.plugin_unloaded:
                 print_message(source, tr('create_backup.abort.plugin_unload'), tell=False)
-                raise InterruptedError()
+                raise InterruptedError('InterruptedError')
 
         # start backup
         print_message(source, tr('create_backup.start'), tell=False)
@@ -54,13 +54,13 @@ def create_backup(source: MCDR.CommandSource, comment: Optional[str], config, lo
         run_git_cmd(config, 'add', '--all')
         ecode, out = run_git_cmd(config, 'commit', '-m', comment)
         if ecode != 0:
-            print_message(source, f'{out}', tell=False)
-            raise RuntimeError()
+            print_message(source, '[git] failed to commit')
+            raise RuntimeError(f'{out}')
 
         ecode, out = run_git_cmd(config, 'gc')
         if ecode != 0:
-            print_message(source, f'{out}', tell=False)
-            raise RuntimeError()
+            print_message(source, '[git] failed to gc ')
+            raise RuntimeError(f'{out}')
 
         # done
         end_time = time.time()
@@ -69,8 +69,8 @@ def create_backup(source: MCDR.CommandSource, comment: Optional[str], config, lo
     except InterruptedError as e:
         log_except(logger, f'[{PLUGIN_ABBR}] {e}')
     except Exception as e:
-        log_except(logger, f'[{PLUGIN_ABBR}] Error creating backup')
-        print_message(source, tr('create_backup.fail', e), tell=False)
+        log_except(logger, f'[{PLUGIN_ABBR}] Error creating backup: {e}')
+        print_message(source, tr('create_backup.fail'), tell=False)
     else:
         source.get_server().dispatch_event(BACKUP_DONE_EVENT, (source,))
     finally:
@@ -86,11 +86,12 @@ def push_backup(source: MCDR.CommandSource, config, logger=None):
     print_message(source, tr('push_backup.push'), tell=False)
     ecode, out = run_git_cmd(config, 'push', '-f', '-q')
     if ecode != 0:
-        print_message(source, tr('push_backup.fail', out), tell=False)
+        print_message(source, tr('push_backup.fail', ecode), tell=False)
+        log_except(logger, f'[{PLUGIN_ABBR}] Pushing error: {out}')
         return
 
     config.last_push_time = time.time()
-    print_message(source, tr('push_backup.success', out), tell=False)
+    print_message(source, tr('push_backup.success'), tell=False)
 
 @single_op(tr('operations.restore'))
 def restore_backup(source: MCDR.CommandSource, slot_info: tuple, config, logger=None):
@@ -127,7 +128,8 @@ def restore_backup(source: MCDR.CommandSource, slot_info: tuple, config, logger=
 
         ecode, out = run_git_cmd(config, 'clean', '-df')
         if ecode != 0:
-            raise RuntimeError(f'Cleaning untracked files unsuccessfully, error {out}')
+            print_message(source, '[git] failed to clean -df')
+            raise RuntimeError(f'{out}')
         ecode, out = run_git_cmd(config, 'reset', '--hard', slot)
         log_info(logger, f'{out}')
         if ecode == 0:
@@ -136,7 +138,6 @@ def restore_backup(source: MCDR.CommandSource, slot_info: tuple, config, logger=
             for file in config.need_backup:
                 if file in ('.gitignore', '.git'):
                     continue
-                remove_files(config.server_path, file, logger)
                 copy_files(config.backup_path, config.server_path, file, config.ignores,
                            logger=logger)
             log_info(logger, f'Backup to {date}({comment})')
@@ -145,7 +146,7 @@ def restore_backup(source: MCDR.CommandSource, slot_info: tuple, config, logger=
         source.get_server().start()
     except Exception as e:
         log_except(logger, f'triggered by {source}\n{e}')
-        print_message(source, f'Fail to restore backup to slot {slot}', tell=False)
+        print_message(source, tr('restore_backup.fail', slot), tell=False)
     else:
         source.get_server().dispatch_event(RESTORE_DONE_EVENT,
                                            (source, slot, date, comment))
@@ -153,7 +154,7 @@ def restore_backup(source: MCDR.CommandSource, slot_info: tuple, config, logger=
 def list_backup(source: MCDR.CommandSource, config, limit: int = None):
     ecode, out = run_git_cmd(config, 'log', '--pretty=oneline', '--no-decorate', '' if limit is None else '-{}'.format(limit))
     if ecode != 0:
-        print_message(source, out, tell=False)
+        print_message(source, out)
         return
     lines = out.splitlines()
 
@@ -204,18 +205,46 @@ def prune_backup(source: MCDR.CommandSource, config, logger=None):
 
         ecode, out = run_git_cmd(config, 'reflog', 'expire --expire-unreachable=now --all')
         if ecode != 0:
-            print_message(logger, out, tell=False)
-            raise RuntimeError()
+            print_message(source, '[git] failed to expire reflog')
+            raise RuntimeError(f'{out}')
         ecode, out = run_git_cmd(config, 'gc', '--prune=now')
         if ecode != 0:
-            print_message(logger, out, tell=False)
-            raise RuntimeError()
+            print_message(source, '[git] failed to gc')
+            raise RuntimeError(f'{out}')
         
         backup_size = format_dir_size(get_dir_size(config.backup_path))
 
         print_message(source, tr('prune_backup.success', backup_size), tell=False)
-    except:
+    except Exception as e:
+        log_except(logger, e)
         print_message(source, tr('prune_backup.fail'), tell=False)
+
+def backup_status(source: MCDR.CommandSource, config, logger=None):
+    try:
+        slot, date, comment = get_backup_info(config, 1)
+    except Exception as e:
+        log_except(logger, e)
+        return
+    slot_info = format_slot_info(slot[:10], date, comment)
+
+    dir_size = get_dir_size(config.backup_path)
+    true_size = get_dir_size(os.path.join(config.backup_path, '.git'))
+    cache_size = dir_size - true_size
+    
+    now = time.time()
+
+    eta_backup = max(0, config.backup_interval - (now - config.last_backup_time))
+    eta_push = max(0, config.push_interval - (now - config.last_push_time))
+
+    msg = tr('status',
+             get_format_time(now),
+             slot_info,
+             f'{eta_backup:.1f}',
+             f'{eta_push:.1f}' if config.git_cfg['use_remote'] else '-',
+             format_dir_size(dir_size),
+             format_dir_size(true_size),
+             format_dir_size(cache_size))
+    print_message(source, msg, tell=False, prefix='')
 
 def command_run(message: Any, text: Any, command: str) -> MCDR.RTextBase:
     fancy_text = message.copy() if isinstance(message, MCDR.RTextBase) else MCDR.RText(message)

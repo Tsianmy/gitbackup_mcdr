@@ -34,12 +34,12 @@ git_backup:
     abort.plugin_unload: Plugin unloaded, §aback up§r aborted!
     abort.no_slot: Available slot not found, §aback up§r aborted!
     success: §aBack up§r successfully, time elapsed §6{0}§rs
-    fail: §aBack up§r unsuccessfully, error code {0}
+    fail: §aBack up§r §cunsuccessfully§r
 
   push_backup:
     push: §aPushing§r... please wait
-    success: §aPush§r successfully, info §6{0}§r
-    fail: §aPush§r unsuccessfully, error §6{0}§r
+    success: §aPush§r successfully
+    fail: §aPush§r §cunsuccessfully§r, error §6{0}§r
 
   restore_backup:
     echo_action: Gonna restore the world to slot §6{0}§r, {1}, {2}
@@ -48,7 +48,8 @@ git_backup:
     abort_hint: §7{0} abort§r to abort
     abort_hover: Click to abort
     get_info:
-      fail: §aGet backup info§r unsuccessfully, error §6{0}§r
+      fail: §aGet backup info§r §cunsuccessfully§r
+    fail: Fail to §crestore§r backup to slot §6{0}§r
 
   confirm_restore.nothing_to_confirm: Nothing to confirm
 
@@ -60,6 +61,18 @@ git_backup:
 
   trigger_abort.abort: Operation terminated!
 
+  status: |
+    ------------ git backups ------------
+    Now: {0}
+    Latest backup:
+      {1}
+    Next backup will be in {2} seconds 
+    Next push will be in {3} seconds
+    Total space consumed: {4}
+      Real space: {5}
+      Cache space: {6}
+    ------------ git backups ------------
+
   list_backup:
     title: §d[Backup Information]§r
     slot:
@@ -70,7 +83,7 @@ git_backup:
   prune_backup:
     start:  §aPruning§r, please wait
     success: "§aPrune§r successfully, backup space: §a{0}§r"
-    fail: §aPrune§r unsuccessfully
+    fail: §aPrune§r §cunsuccessfully§r
 
   print_help:
     hotbar: §d[Hotbar]§r
